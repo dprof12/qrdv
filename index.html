@@ -15,7 +15,7 @@
 </head>
 <body>
 
-    <h1>Generate QR Rawrr</h1>
+    <h1>Generate QR Rawrrrrrrrrrrrrr</h1>
     <textarea id="inputText" rows="10" cols="50" placeholder="Masukkan teks di sini (pisahkan per baris)..."></textarea><br>
     <button id="generateQR">Generate QR Codes</button>
     <button id="exportPDF">Export ke PDF</button>
@@ -47,12 +47,27 @@
             texts.forEach((text, index) => {
                 const trimmedText = text.trim();
                 if (trimmedText) {
-                    // Menambahkan teks ke PDF
-                    pdf.text(trimmedText, 10, 10);
+                    // Menambahkan teks ke PDF dengan maksimal 70 karakter dalam 1 baris, lalu baris selanjutnya untuk melanjutkan
+                    let y = 10;
+                    let words = trimmedText.split(' ');
+                    let currentLine = '';
+                    for (let i = 0; i < words.length; i++) {
+                        if (currentLine.length + words[i].length <= 70) {
+                            currentLine += words[i] + ' ';
+                        } else {
+                            pdf.text(currentLine.trim(), 10, y);
+                            y += 10; // Menyesuaikan posisi y untuk baris berikutnya
+                            currentLine = words[i] + ' ';
+                        }
+                    }
+                    if (currentLine) {
+                        pdf.text(currentLine.trim(), 10, y);
+                        y += 10; // Menyesuaikan posisi y untuk baris berikutnya
+                    }
                     const qrCodeCanvas = $('#qrCodeContainer .qrCode').eq(index).find('canvas')[0];
                     if (qrCodeCanvas) {
                         const imgData = qrCodeCanvas.toDataURL('image/png');
-                        pdf.addImage(imgData, 'PNG', 10, 50, 100, 100); // Menambahkan gambar QR yang sesuai dengan tulisan, diatur untuk berada di tengah halaman
+                        pdf.addImage(imgData, 'PNG', 50, y + 10, 100, 100); // Menyesuaikan posisi y untuk gambar QR
                         pdf.addPage(); // Menambahkan halaman baru untuk QR code berikutnya
                     }
                 }
